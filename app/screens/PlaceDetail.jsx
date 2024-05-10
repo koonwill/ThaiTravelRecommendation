@@ -31,17 +31,18 @@ export default function PlaceDetail({ navigation, route }) {
 
             const hasPhoneNumbers = data.contact && (data.contact.phones?.length > 0 || data.contact.mobiles?.length > 0);
 
-            const placeInformation = [data.place_information.introduction, data.place_information.detail].filter(Boolean).join('\n');
-
             const placeDetail = {
                 id: data.place_id,
                 img: data.thumbnail_url,
                 place_name: data.place_name,
-                address: addressLines || 'No address available',
-                detail: placeInformation || 'No details available',
-                telephone: hasPhoneNumbers ? (data.contact.phones ? data.contact.phones[0] : data.contact.mobiles[0]) : 'No phone number available',
-                facilities: data.facilities && data.facilities.length > 0 ? data.facilities.map(facility => facility.description).join(', ') : 'Parking',
+                address: addressLines || 'No address',
+                detail: data.place_information.introduction || 'No details',
+                telephone: hasPhoneNumbers ? (data.contact.phones ? data.contact.phones[0] : data.contact.mobiles[0]) : 'No phone number',
+                email: data.contact.emails[0] || 'No email',
+                website: data.contact.websites[0] || 'No website',
+                facilities: data.facilities && data.facilities.length > 0 ? data.facilities.map(facility => facility.description).join(', ') : 'No facilities',
                 services: data.services || '',
+                payment_method: data.payment_method && data.payment_method.length > 0 ? data.payment_method.map(method => method.description).join(', ') : 'No payment methods',
             };
 
             setPlaceDetail(placeDetail);
@@ -63,15 +64,35 @@ export default function PlaceDetail({ navigation, route }) {
                     </Text>
                     <Text style={styles.detailText}>
                         <Text style={styles.label}>Address: </Text>
-                        {placeDetail.address || 'Hamji'}
+                        {placeDetail.address}
                     </Text>
                     <Text style={styles.detailText}>
                         <Text style={styles.label}>Detail: </Text>
-                        {placeDetail.detail || 'Hamji'}
+                        {placeDetail.detail}
                     </Text>
                     <Text style={styles.detailText}>
                         <Text style={styles.label}>Tel: </Text>
-                        {placeDetail.telephone || '08-00xxxxx'}
+                        {placeDetail.telephone}
+                    </Text>
+                    <Text style={styles.detailText}>
+                        <Text style={styles.label}>Email: </Text>
+                        {placeDetail.email}
+                    </Text>
+                    <Text style={styles.detailText}>
+                        <Text style={styles.label}>Website: </Text>
+                        {placeDetail.website}
+                    </Text>
+                    <Text style={styles.detailText}>
+                        <Text style={styles.label}>Facilities: </Text>
+                        {placeDetail.facilities}
+                    </Text>
+                    <Text style={styles.detailText}>
+                        <Text style={styles.label}>Services: </Text>
+                        {placeDetail.services}
+                    </Text>
+                    <Text style={styles.detailText}>
+                        <Text style={styles.label}>Payment Method: </Text>
+                        {placeDetail.payment_method}
                     </Text>
                 </View>
             ) : (
