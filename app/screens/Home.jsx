@@ -1,32 +1,51 @@
-import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, View, Text, TextInput, Image, ScrollView, FlatList, Dimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { SafeAreaView, StyleSheet, View, Text, TextInput, Image, ScrollView, FlatList, Dimensions, Platform, TouchableOpacity } from 'react-native';
+import axios from 'axios';
+import {TAT_API_KEY} from '@env';
 
 const { width } = Dimensions.get('window');
 
-export default function HomePage() {
-  const [touristAttractions] = useState([
-    { title: 'Attraction 1', image: require('../img/main_bg.jpg') },
-    { title: 'Attraction 2', image: require('../img/main_bg.jpg') },
-    { title: 'Attraction 3', image: require('../img/main_bg.jpg') },
-  ]);
+export default function HomePage({ navigation }) {
+  const [touristAttractions, setTouristAttractions] = useState([]);
+  const [interestingEvents, setInterestingEvents] = useState([]);
+  const [restaurants, setRestaurants] = useState([]);
+  
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  const [interestingEvents] = useState([
-    { title: 'Attraction 1', image: require('../img/main_bg.jpg') },
-    { title: 'Attraction 2', image: require('../img/main_bg.jpg') },
-    { title: 'Attraction 3', image: require('../img/main_bg.jpg') },
-  ]);
+  const fetchData = async () => {
+    const headers = {
+      'Content-Type': 'application/json',
+      'Accept-Language': 'EN',
+      Authorization: `Bearer ${TAT_API_KEY}`,
+    };
 
-  const [restaurants] = useState([
-    { title: 'Attraction 1', image: require('../img/main_bg.jpg') },
-    { title: 'Attraction 2', image: require('../img/main_bg.jpg') },
-    { title: 'Attraction 3', image: require('../img/main_bg.jpg') },
-  ]);
+    try {
+      const attractionResponse = await axios.get('https://tatapi.tourismthailand.org/tatapi/v5/places/search?numberOfResult=5&destination=Bangkok&categorycodes=ATTRACTION', { headers });
+      setTouristAttractions(attractionResponse.data.result.map(item => ({id: item.place_id, category:item.category_code, title: item.place_name, image: { uri: item.thumbnail_url } })));
+
+      const accommodationResponse = await axios.get('https://tatapi.tourismthailand.org/tatapi/v5/places/search?numberOfResult=5&destination=Bangkok&categorycodes=ACCOMMODATION', { headers });
+      setInterestingEvents(accommodationResponse.data.result.map(item => ({id: item.place_id, category:item.category_code,title: item.place_name, image: { uri: item.thumbnail_url } })));
+
+      const restaurantResponse = await axios.get('https://tatapi.tourismthailand.org/tatapi/v5/places/search?numberOfResult=5&destination=Bangkok&categorycodes=RESTAURANT', { headers });
+      setRestaurants(restaurantResponse.data.result.map(item => ({id:item.place_id, category:item.category_code, title: item.place_name, image: { uri: item.thumbnail_url } })));
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  }
+
+  const handlePlacePress = (place) => {
+    navigation.navigate('PlaceDetail', { placeId: place.id, category: place.category.toLowerCase()});
+  };
 
   const renderCarouselItem = ({ item }) => (
+    <TouchableOpacity onPress={() => handlePlacePress(item)}>
     <View style={styles.carouselItem}>
       <Image source={item.image} style={[styles.carouselImage, { width: width * 0.8 }]} />
       <Text style={styles.carouselTitle}>{item.title}</Text>
     </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -75,6 +94,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    paddingTop: Platform.OS === 'android' ? 40 : 0,
   },
   header: {
     flexDirection: 'row',
