@@ -9,6 +9,10 @@ export default function SignupScreen({ navigation, route }) {
 
   const handleSubmit = async () => {
     try {
+      if (!email || !password || !confirmPassword) {
+        Alert.alert('Error', 'Please fill in all fields');
+        return;
+      }
       if (password !== confirmPassword) {
         Alert.alert('Error', 'Passwords do not match');
         return;
