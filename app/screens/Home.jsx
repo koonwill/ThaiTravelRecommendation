@@ -1,26 +1,26 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, Image, ScrollView, FlatList, Dimensions } from 'react-native';
+import { SafeAreaView, StyleSheet, View, Text, TextInput, Image, ScrollView, FlatList, Dimensions } from 'react-native';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 export default function HomePage() {
-    const [touristAttractions, setTouristAttractions] = useState([
-        { title: 'Attraction 1', image: require('../img/main_bg.jpg') },
-        { title: 'Attraction 2', image: require('../img/main_bg.jpg') },
-        { title: 'Attraction 3', image: require('../img/main_bg.jpg') },
-      ]);
-    
-      const [interestingEvents, setInterestingEvents] = useState([
-        { title: 'Attraction 1', image: require('../img/main_bg.jpg') },
-        { title: 'Attraction 2', image: require('../img/main_bg.jpg') },
-        { title: 'Attraction 3', image: require('../img/main_bg.jpg') },
-      ]);
-    
-      const [restaurants, setRestaurants] = useState([
-        { title: 'Attraction 1', image: require('../img/main_bg.jpg') },
-        { title: 'Attraction 2', image: require('../img/main_bg.jpg') },
-        { title: 'Attraction 3', image: require('../img/main_bg.jpg') },
-      ]);
+  const [touristAttractions] = useState([
+    { title: 'Attraction 1', image: require('../img/main_bg.jpg') },
+    { title: 'Attraction 2', image: require('../img/main_bg.jpg') },
+    { title: 'Attraction 3', image: require('../img/main_bg.jpg') },
+  ]);
+
+  const [interestingEvents] = useState([
+    { title: 'Attraction 1', image: require('../img/main_bg.jpg') },
+    { title: 'Attraction 2', image: require('../img/main_bg.jpg') },
+    { title: 'Attraction 3', image: require('../img/main_bg.jpg') },
+  ]);
+
+  const [restaurants] = useState([
+    { title: 'Attraction 1', image: require('../img/main_bg.jpg') },
+    { title: 'Attraction 2', image: require('../img/main_bg.jpg') },
+    { title: 'Attraction 3', image: require('../img/main_bg.jpg') },
+  ]);
 
   const renderCarouselItem = ({ item }) => (
     <View style={styles.carouselItem}>
@@ -30,12 +30,12 @@ export default function HomePage() {
   );
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.header, { width: width }]}>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
         <Text style={styles.title}>HomePage</Text>
       </View>
-      <TextInput style={[styles.searchInput, { width: width * 0.9 }]} placeholder="Search" />
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <TextInput style={styles.searchInput} placeholder="Search" />
+      <ScrollView>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Tourist Attraction</Text>
           <FlatList
@@ -43,6 +43,7 @@ export default function HomePage() {
             renderItem={renderCarouselItem}
             horizontal
             showsHorizontalScrollIndicator={false}
+            keyExtractor={(item, index) => index.toString()}
           />
         </View>
         <View style={styles.section}>
@@ -52,6 +53,7 @@ export default function HomePage() {
             renderItem={renderCarouselItem}
             horizontal
             showsHorizontalScrollIndicator={false}
+            keyExtractor={(item, index) => index.toString()}
           />
         </View>
         <View style={styles.section}>
@@ -61,10 +63,11 @@ export default function HomePage() {
             renderItem={renderCarouselItem}
             horizontal
             showsHorizontalScrollIndicator={false}
+            keyExtractor={(item, index) => index.toString()}
           />
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -72,7 +75,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
   },
   header: {
     flexDirection: 'row',
@@ -93,10 +95,11 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginVertical: 10,
+    width: '90%',
+    alignSelf: 'center',
   },
   section: {
     marginVertical: 20,
-    alignItems: 'center',
     width: '100%',
   },
   sectionTitle: {

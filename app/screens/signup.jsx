@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Alert } from 'react-native';
+import { SafeAreaView, View, Text, TextInput, Button, StyleSheet, ImageBackground, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SignupScreen({ navigation, route }) {
@@ -24,9 +24,6 @@ export default function SignupScreen({ navigation, route }) {
       const userData = { email, password };
       await AsyncStorage.setItem(email, JSON.stringify(userData));
 
-      // Optionally, you can navigate to another screen upon successful signup
-      // navigation.navigate('Home');
-
       // Clear form fields
       setEmail('');
       setPassword('');
@@ -42,40 +39,45 @@ export default function SignupScreen({ navigation, route }) {
   const background = require('../img/main_bg.jpg');
 
   return (
-    <ImageBackground source={background} style={styles.container}>
-      <View style={styles.formContainer}>
-        <Text style={styles.title}>Sign Up</Text>
-        <TextInput
-          placeholder="Email Address"
-          value={email}
-          onChangeText={setEmail}
-          style={styles.input}
-        />
-        <TextInput
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          style={styles.input}
-        />
-        <TextInput
-          placeholder="Confirm Password"
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          secureTextEntry
-          style={styles.input}
-        />
-        <Button title="Sign Up" onPress={handleSubmit} />
-        <Text style={styles.signinText} onPress={() => navigation.navigate('Login')}>
-          Already have an account? Sign In
-        </Text>
-      </View>
-    </ImageBackground>
+    <SafeAreaView style={styles.container}>
+      <ImageBackground source={background} style={styles.imageBackground}>
+        <View style={styles.formContainer}>
+          <Text style={styles.title}>Sign Up</Text>
+          <TextInput
+            placeholder="Email Address"
+            value={email}
+            onChangeText={setEmail}
+            style={styles.input}
+          />
+          <TextInput
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            style={styles.input}
+          />
+          <TextInput
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry
+            style={styles.input}
+          />
+          <Button title="Sign Up" onPress={handleSubmit} />
+          <Text style={styles.signinText} onPress={() => navigation.navigate('Login')}>
+            Already have an account? Sign In
+          </Text>
+        </View>
+      </ImageBackground>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  imageBackground: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
