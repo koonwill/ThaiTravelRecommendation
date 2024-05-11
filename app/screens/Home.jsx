@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, View, Text, TextInput, Image, ScrollView, FlatList, Dimensions, Platform, TouchableOpacity } from 'react-native';
 import axios from 'axios';
-import {TAT_API_KEY} from '@env';
+import { TAT_API_KEY } from '@env';
 
 const { width } = Dimensions.get('window');
 
@@ -9,7 +9,7 @@ export default function HomePage({ navigation }) {
   const [touristAttractions, setTouristAttractions] = useState([]);
   const [interestingEvents, setInterestingEvents] = useState([]);
   const [restaurants, setRestaurants] = useState([]);
-  
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -22,29 +22,33 @@ export default function HomePage({ navigation }) {
     };
 
     try {
-      const attractionResponse = await axios.get('https://tatapi.tourismthailand.org/tatapi/v5/places/search?numberOfResult=5&destination=Bangkok&categorycodes=ATTRACTION', { headers });
-      setTouristAttractions(attractionResponse.data.result.map(item => ({id: item.place_id, category:item.category_code, title: item.place_name, image: { uri: item.thumbnail_url } })));
+      const attractionResponse = await axios.get('https://tatapi.tourismthailand.org/tatapi/v5/places/search?numberOfResult=50&destination=Bangkok&categorycodes=ATTRACTION', { headers });
+      setTouristAttractions(attractionResponse.data.result.map(item => ({ id: item.place_id, category: item.category_code, title: item.place_name, image: { uri: item.thumbnail_url } })));
 
-      const accommodationResponse = await axios.get('https://tatapi.tourismthailand.org/tatapi/v5/places/search?numberOfResult=5&destination=Bangkok&categorycodes=ACCOMMODATION', { headers });
-      setInterestingEvents(accommodationResponse.data.result.map(item => ({id: item.place_id, category:item.category_code,title: item.place_name, image: { uri: item.thumbnail_url } })));
+      const accommodationResponse = await axios.get('https://tatapi.tourismthailand.org/tatapi/v5/places/search?numberOfResult=50&destination=Bangkok&categorycodes=ACCOMMODATION', { headers });
+      setInterestingEvents(accommodationResponse.data.result.map(item => ({ id: item.place_id, category: item.category_code, title: item.place_name, image: { uri: item.thumbnail_url } })));
 
-      const restaurantResponse = await axios.get('https://tatapi.tourismthailand.org/tatapi/v5/places/search?numberOfResult=5&destination=Bangkok&categorycodes=RESTAURANT', { headers });
-      setRestaurants(restaurantResponse.data.result.map(item => ({id:item.place_id, category:item.category_code, title: item.place_name, image: { uri: item.thumbnail_url } })));
+      const restaurantResponse = await axios.get('https://tatapi.tourismthailand.org/tatapi/v5/places/search?numberOfResult=50&destination=Bangkok&categorycodes=RESTAURANT', { headers });
+      setRestaurants(restaurantResponse.data.result.map(item => ({ id: item.place_id, category: item.category_code, title: item.place_name, image: { uri: item.thumbnail_url } })));
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   }
 
   const handlePlacePress = (place) => {
-    navigation.navigate('PlaceDetail', { placeId: place.id, category: place.category.toLowerCase()});
+    navigation.navigate('PlaceDetail', { placeId: place.id, category: place.category.toLowerCase() });
   };
 
   const renderCarouselItem = ({ item }) => (
     <TouchableOpacity onPress={() => handlePlacePress(item)}>
-    <View style={styles.carouselItem}>
-      <Image source={item.image} style={[styles.carouselImage, { width: width * 0.8 }]} />
-      <Text style={styles.carouselTitle}>{item.title}</Text>
-    </View>
+      <View style={styles.carouselItem}>
+        {item.image.uri ? (
+          <Image source={item.image} style={[styles.carouselImage, { width: width * 0.8 }]} />
+        ) : (
+          <Image source={require('../img/image_not_avaiable.png')} style={[styles.carouselImage, { width: width * 0.8 }]} />
+        )}
+        <Text style={styles.carouselTitle}>{item.title}</Text>
+      </View>
     </TouchableOpacity>
   );
 
@@ -66,7 +70,7 @@ export default function HomePage({ navigation }) {
           />
         </View>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Interesting Event</Text>
+          <Text style={styles.sectionTitle}>Accommodation</Text>
           <FlatList
             data={interestingEvents}
             renderItem={renderCarouselItem}
