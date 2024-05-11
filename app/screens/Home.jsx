@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, View, Text, TextInput, Image, ScrollView, FlatList, Dimensions, Platform, TouchableOpacity } from 'react-native';
+import * as Location from 'expo-location';
 import axios from 'axios';
+import Header from '../components/Header';
 import { TAT_API_KEY } from '@env';
 
 const { width } = Dimensions.get('window');
@@ -9,10 +11,22 @@ export default function HomePage({ navigation }) {
   const [touristAttractions, setTouristAttractions] = useState([]);
   const [interestingEvents, setInterestingEvents] = useState([]);
   const [restaurants, setRestaurants] = useState([]);
+  const [location, setLocation] = useState('');
 
   useEffect(() => {
+    getPermission();
     fetchData();
   }, []);
+
+  const getPermission = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      console.log('Permission to access location was denied');
+      return;
+    }
+    let location = await Location.getCurrentPositionAsync({});
+    setLocation(location);
+  };
 
   const fetchData = async () => {
     const headers = {
@@ -22,13 +36,13 @@ export default function HomePage({ navigation }) {
     };
 
     try {
-      const attractionResponse = await axios.get('https://tatapi.tourismthailand.org/tatapi/v5/places/search?numberOfResult=50&destination=Bangkok&categorycodes=ATTRACTION', { headers });
+      const attractionResponse = await axios.get('https://tatapi.tourismthailand.org/tatapi/v5/places/search?location=${location.coords.latitude},${location.coords.longtitude}&radius=1000&numberOfResult=50&categorycodes=ATTRACTION', { headers });
       setTouristAttractions(attractionResponse.data.result.map(item => ({ id: item.place_id, category: item.category_code, title: item.place_name, image: { uri: item.thumbnail_url } })));
 
-      const accommodationResponse = await axios.get('https://tatapi.tourismthailand.org/tatapi/v5/places/search?numberOfResult=50&destination=Bangkok&categorycodes=ACCOMMODATION', { headers });
+      const accommodationResponse = await axios.get('https://tatapi.tourismthailand.org/tatapi/v5/places/search?location=${location.coords.latitude},${location.coords.longtitude}&radius=1000&numberOfResult=50&categorycodes=ACCOMMODATION', { headers });
       setInterestingEvents(accommodationResponse.data.result.map(item => ({ id: item.place_id, category: item.category_code, title: item.place_name, image: { uri: item.thumbnail_url } })));
 
-      const restaurantResponse = await axios.get('https://tatapi.tourismthailand.org/tatapi/v5/places/search?numberOfResult=50&destination=Bangkok&categorycodes=RESTAURANT', { headers });
+      const restaurantResponse = await axios.get('https://tatapi.tourismthailand.org/tatapi/v5/places/search?location=${location.coords.latitude},${location.coords.longtitude}&radius=1000&numberOfResult=50&categorycodes=RESTAURANT', { headers });
       setRestaurants(restaurantResponse.data.result.map(item => ({ id: item.place_id, category: item.category_code, title: item.place_name, image: { uri: item.thumbnail_url } })));
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -54,10 +68,10 @@ export default function HomePage({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>HomePage</Text>
-      </View>
-      <TextInput style={styles.searchInput} placeholder="Search" />
+      <Header title="Homepage" />
+      <TouchableOpacity style={styles.searchContainer} onPress={() => navigation.navigate('Search')}>
+        <Text style={styles.searchInput}>Search</Text>
+      </TouchableOpacity>
       <ScrollView>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Tourist Attraction</Text>
@@ -100,17 +114,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingTop: Platform.OS === 'android' ? 40 : 0,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: '#8A2BE2',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
+  searchContainer: {
+    padding: 10,
   },
   searchInput: {
     height: 40,
@@ -118,9 +123,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 5,
     paddingHorizontal: 10,
-    marginVertical: 10,
-    width: '90%',
-    alignSelf: 'center',
+    paddingTop: 8,
   },
   section: {
     marginVertical: 20,

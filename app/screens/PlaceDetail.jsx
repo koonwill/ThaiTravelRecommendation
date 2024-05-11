@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Platform, Image } from 'react-native';
 import axios from 'axios';
 import { TAT_API_KEY } from '@env';
+import Header from '../components/Header';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native-gesture-handler';
 
@@ -66,9 +67,7 @@ export default function PlaceDetail({ navigation, route }) {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.headerContainer}>
-                <Text style={styles.headerText}>Place Detail</Text>
-            </View>
+            <Header title="Place Detail" backButton navigation={navigation} />
             {placeDetail ? (
                 <ScrollView style={styles.detailContainer}>
                     <Image source={placeDetail.img ? { uri: placeDetail.img } : require('../img/image_not_avaiable.png')} style={styles.image} />
@@ -79,7 +78,7 @@ export default function PlaceDetail({ navigation, route }) {
                         </View>
                         <View style={styles.detailRow}>
                             <Text style={styles.label}>Address: </Text>
-                            <Text>{placeDetail.address}</Text>
+                            <Text ellipsizeMode='tail' style={styles.flexibleText}>{placeDetail.address}</Text>
                         </View>
                         <View style={styles.detailRow}>
                             <Text style={styles.label}>Detail: </Text>
@@ -122,10 +121,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: Platform.OS === 'android' ? 40 : 0,
+        paddingTop: Platform.OS === 'android' ? 0 : 0,
     },
     headerContainer: {
-        backgroundColor: '#9370DB',
+        backgroundColor: '#8A2BE2',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
         padding: 8,
         marginBottom: 16,
     },
