@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform, Image } from 'react-native';
 import axios from 'axios';
 import { TAT_API_KEY } from '@env';
+import { collapseTextChangeRangesAcrossMultipleVersions } from 'typescript';
 
 export default function PlaceDetail({ navigation, route }) {
     const { placeId, category } = route.params;
@@ -30,19 +31,30 @@ export default function PlaceDetail({ navigation, route }) {
             ].filter(Boolean).join('\n');
 
             const hasPhoneNumbers = data.contact && (data.contact.phones?.length > 0 || data.contact.mobiles?.length > 0);
-
             const placeDetail = {
-                id: data.place_id,
-                img: data.thumbnail_url,
-                place_name: data.place_name,
-                address: addressLines || 'No address',
-                detail: data.place_information.introduction || 'No details',
-                telephone: hasPhoneNumbers ? (data.contact.phones ? data.contact.phones[0] : data.contact.mobiles[0]) : 'No phone number',
-                email: data.contact.emails[0] || 'No email',
-                website: data.contact.websites[0] || 'No website',
-                facilities: data.facilities && data.facilities.length > 0 ? data.facilities.map(facility => facility.description).join(', ') : 'No facilities',
-                services: data.services || '',
-                payment_method: data.payment_method && data.payment_method.length > 0 ? data.payment_method.map(method => method.description).join(', ') : 'No payment methods',
+                id: data.place_id ?? '-',
+                img: data.thumbnail_url ?? '-',
+                place_name: data.place_name ?? '-',
+                address: addressLines ?? '-',
+                detail: data.place_information?.introduction ?? '-',
+                telephone: hasPhoneNumbers ? (data.contact?.phones ? data.contact.phones[0] : data.contact?.mobiles[0]) ?? '-' : '-',
+                email: data.contact?.emails ? data.contact.emails[0] ?? '-' : '-',
+                website: data.contact?.websites ? data.contact.websites[0] ?? '-' : '-',
+                facilities: data.facilities && data.facilities.length > 0
+                ? data.facilities.map(facility => facility.description ?? '-').join(', ')
+                : data.facilities == null || data.facilities == undefined
+                ? '-'
+                : '-',
+                services: data.services && data.services.length > 0
+                ? data.services.map(service => service.description ?? '-').join(', ')
+                : data.services == null || data.services == undefined
+                ? '-'
+                : '-',
+                payment_method: data.payment_method && data.payment_method.length > 0
+                ? data.payment_method.map(payment => payment.description ?? '-').join(', ')
+                : data.payment_method == null || data.payment_method == undefined
+                ? '-'
+                : '-',
             };
 
             setPlaceDetail(placeDetail);
@@ -58,6 +70,7 @@ export default function PlaceDetail({ navigation, route }) {
             </View>
             {placeDetail ? (
                 <View style={styles.detailContainer}>
+                <Image source={{ uri: placeDetail.img }} style={styles.image} />
                     <Text style={styles.detailText}>
                         <Text style={styles.label}>Name: </Text>
                         {placeDetail.place_name}
@@ -106,6 +119,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
+        paddingTop: Platform.OS === 'android' ? 40 : 0,
     },
     headerContainer: {
         backgroundColor: '#9370DB',
@@ -116,6 +130,11 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 18,
         fontWeight: 'bold',
+    },
+    image: {
+        width: '100%',
+        height: 200,
+        marginBottom: 16,
     },
     detailContainer: {
         padding: 16,

@@ -13,6 +13,22 @@ export default function SignupScreen({ navigation, route }) {
         Alert.alert('Error', 'Please fill in all fields');
         return;
       }
+      if (password.length < 12) {
+        Alert.alert('Error', 'Password must be at least 12 characters');
+        return;
+      }
+      if (!/\d/.test(password)) {
+        Alert.alert('Error', 'Password must contain at least one digit');
+        return;
+      }
+      if (!/[a-zA-Z]/.test(password)) {
+        Alert.alert('Error', 'Password must contain at least one letter');
+        return;
+      }
+      if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(password)) {
+        Alert.alert('Error', 'Password must contain at least one special character');
+        return;
+      }
       if (password !== confirmPassword) {
         Alert.alert('Error', 'Passwords do not match');
         return;
