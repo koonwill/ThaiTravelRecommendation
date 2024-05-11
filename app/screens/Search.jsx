@@ -40,6 +40,10 @@ export default function SearchScreen({ navigation }) {
             Alert.alert('Error', 'Search Text is required');
             return;
         }
+        if (searchText.length < 2){
+            Alert.alert('Error', 'Search Text must be at least 2 characters');
+            return;
+        }
         // Navigate to SearchResult page with selected filters as route params
         navigation.navigate('SearchResult', { searchText: searchText, filters: selectedFilters, latitude: location.coords.latitude, longitude: location.coords.longitude});
     };
